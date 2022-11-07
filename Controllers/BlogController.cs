@@ -14,14 +14,14 @@ public class BlogController : Controller
     
     private readonly ILogger<BlogController> _logger;
     private ApplicationDbContext _db;
-    private UserManager<ApplicationUserModel> _um;
+    private readonly UserManager<ApplicationUserModel> _userManager;
     private RoleManager<IdentityRole> _rm;
     private readonly SignInManager<ApplicationUserModel> _signInManager;
 
-    public BlogController(ApplicationDbContext db, UserManager<ApplicationUserModel> um, RoleManager<IdentityRole> rm, ILogger<BlogController> logger, SignInManager<ApplicationUserModel> signInManager)
+    public BlogController(ApplicationDbContext db, UserManager<ApplicationUserModel> userManager, RoleManager<IdentityRole> rm, ILogger<BlogController> logger, SignInManager<ApplicationUserModel> signInManager)
     {
         _db = db;
-        _um = um;
+        _userManager = userManager;
         _rm = rm;
         _logger = logger;
         _signInManager = signInManager;
@@ -30,24 +30,19 @@ public class BlogController : Controller
     
     // GET
     [HttpGet]
-    [AllowAnonymous]
+    [Authorize(Roles = "BlogUser")] // only users with the role BlogUser can access this page
     public async Task<IActionResult> Index()
     {
-        // making temporary models to send to the view
+        // Get the user who are asking for data
+        var currentUser = await _userManager.GetUserAsync(HttpContext.User);
+        
         var posts = await _db.PostModels
-            .Include(p => p.ApplicationUser)
-            .Select( p => new PostModel
-        {
-            Id = p.Id,
-            Title = p.Title,
-            Summary = p.Summary,
-            Content = p.Content,
-            ApplicationUserId = p.ApplicationUserId,
-            ApplicationUser = p.ApplicationUser,
-            Nickname = p.Nickname,
-            //BlogModel = blogModel.Id;
-            Time = p.Time
-        } )
+                // hvor post sin ApplictationUserId er samme som currentUser.Id
+                // select * 
+                // from PostModels
+                // where ApplicationUserId = {{currentUser.Id}}
+                // order by PostModels.PostDate desc
+            .Where(post => post.ApplicationUserId == currentUser.Id)
             .OrderByDescending(p => p.Time)
             .ToListAsync();
 
@@ -60,7 +55,7 @@ public class BlogController : Controller
     [Authorize]
     public async Task<IActionResult> Add()
     {
-        var applicationUserModel = await _um.GetUserAsync(User);
+        var applicationUserModel = await _userManager.GetUserAsync(User);
         
         if (_signInManager.IsSignedIn(User) && applicationUserModel != null)
         {
@@ -76,10 +71,10 @@ public class BlogController : Controller
     [Authorize]
     public async Task<RedirectResult> Add(PostModel postModel)
     {
-        var applicationUserModel = await _um.GetUserAsync(User);
+        var applicationUserModel = await _userManager.GetUserAsync(User);
 
 
-        if (_signInManager.IsSignedIn(User) && _um.GetUserAsync(User) != null)
+        if (_signInManager.IsSignedIn(User) && _userManager.GetUserAsync(User) != null)
         {
             //postModel.Nickname = applicationUserModel.Nickname;
             postModel.ApplicationUser = applicationUserModel;
@@ -99,7 +94,7 @@ public class BlogController : Controller
     [Authorize]
     public async Task<IActionResult> Edit(int id)
     {
-        var applicationUserModel = await _um.GetUserAsync(User);
+        var applicationUserModel = await _userManager.GetUserAsync(User);
         var post = await _db.PostModels.FindAsync(id);
         
 
@@ -138,7 +133,7 @@ public class BlogController : Controller
     [Authorize]
     public async Task<RedirectResult> Edit(PostModel postModel)
     {
-        var applicationUserModel = await _um.GetUserAsync(User);
+        var applicationUserModel = await _userManager.GetUserAsync(User);
         
       
             //postModel.Nickname = applicationUserModel.Nickname;
