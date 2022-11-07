@@ -1,0 +1,36 @@
+@using Microsoft.AspNetCore.Identity
+
+@inject SignInManager<ApplicationUserModel> SignInManager;
+@model IEnumerable<PostModel>
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "_Layout";
+}
+
+@if (SignInManager.IsSignedIn(User) && (User.IsInRole("Admin") || User.IsInRole("BlogUser")))
+{
+   
+}
+<div>
+    <span>
+        <caption>New post</caption><a asp-area="" asp-controller="Blog" asp-action="Add"><button id="buttonAdd">Add</button></a>
+    </span>
+</div>
+
+
+
+<h2>Welcome to the blog!</h2>
+<hr/>
+<div>
+@foreach (var postModel in Model)
+    {
+        if (postModel.Summary != "")
+        {
+            
+            <partial name="_PostPartial" model="postModel"/>
+        }
+    }
+</div>
+
+<!-- this code is retrieved from 'Shared/_PostPartial' -->

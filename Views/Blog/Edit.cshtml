@@ -1,0 +1,31 @@
+@using Microsoft.AspNetCore.Identity
+@model PostModel
+@inject UserManager<ApplicationUserModel> UserManager
+@{
+    ViewBag.Title = "title";
+    Layout = "_Layout";
+
+    var user = await UserManager.GetUserAsync(User);
+}
+
+<form class="mb-5" asp-controller="Blog" asp-action="Edit" method="post">
+    <div asp-validation-summary="All"></div>
+    <div id="Title" class="form-group">
+        <label asp-for="Title">Title</label>
+        <br>
+        <input type="text" asp-for="Title" name="Title"/>
+
+    </div>
+    <div id="Summary" class="form-group">
+        <label asp-for="Summary">Summary</label>
+        <br>
+        <input type="text" asp-for="Summary" name="Summary"/>
+    </div>
+    <div id="Content" class="form-group">
+        <label asp-for="Content">Content</label>
+        <br>
+        <textarea asp-for="Content" name="Content" ></textarea>
+    </div>
+    <input type="submit" id="Submit" name="submit" value="Submit"/>
+    
+</form>

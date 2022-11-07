@@ -1,0 +1,31 @@
+@using Microsoft.AspNetCore.Identity
+@using Microsoft.EntityFrameworkCore
+@inject UserManager<ApplicationUserModel> UserManager
+@inject SignInManager<ApplicationUserModel> SignInManager
+@model PostModel
+
+
+
+ @{
+     var user = await UserManager.GetUserAsync(User);
+    
+ }
+
+<div>
+    <p class="Nickname">@Model.Nickname</p>
+    <p class="Title">@Model.Title</p>
+    <p class="Summary">@Model.Summary</p>
+    <p class="Content">@Model.Content</p>
+    <p class="Time">@Model.Time.ToString("dd.MM.yyyy")</p>
+    
+   
+    @if (SignInManager.IsSignedIn(User) && user != null)
+    {
+        @if (Model.Nickname== user.Nickname)
+        {
+            <a href="https://localhost:7223/Blog/Edit/@Model.Id"><button>edit</button></a>
+        }
+    }
+</div>
+<br/>
+ 

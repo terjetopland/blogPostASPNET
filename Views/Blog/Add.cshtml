@@ -1,0 +1,43 @@
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<ApplicationUserModel> SignInManager
+@inject UserManager<ApplicationUserModel> UserManager
+
+
+@model PostModel
+
+
+@{
+    ViewBag.Title = "postModel";
+    Layout = "_Layout";
+}
+
+@{
+    var applicationUserModel = await UserManager.GetUserAsync(User);
+}
+
+<!-- form for putting in new -->
+<form class="mb-5" asp-controller="Blog" asp-action="Add" method="post">
+    <div asp-validation-summary="All"></div>
+    <div id="Title" class="form-group">
+        <label asp-for="Title">Title</label>
+        <br>
+        <input type="text" placeholder="Enter title of blog" asp-for="Title" name="Title"/>
+
+    </div>
+    <div id="Summary" class="form-group">
+        <label asp-for="Summary">Summary</label>
+        <br>
+        <input type="text" placeholder="Enter a summary" asp-for="Summary" name="Summary"/>
+    </div>
+    <div id="Content" class="form-group">
+        <label asp-for="Content">Content</label>
+        <br>
+        <textarea asp-for="Content" name="Content" placeholder="Whats on your mind?"></textarea>
+    </div>
+    <input type="submit" id="Submit" name="submit" value="Submit"/>
+
+
+</form>
+
+
+
