@@ -1,11 +1,7 @@
-@using Microsoft.AspNetCore.Identity
 @model PostModel
-@inject UserManager<ApplicationUserModel> UserManager
 @{
     ViewBag.Title = "title";
     Layout = "_Layout";
-
-    var user = await UserManager.GetUserAsync(User);
 }
 
 <form class="mb-5" asp-controller="Blog" asp-action="Edit" method="post">
