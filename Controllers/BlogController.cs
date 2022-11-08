@@ -30,7 +30,8 @@ public class BlogController : Controller
     
     // GET
     [HttpGet]
-    [Authorize(Roles = "BlogUser")] // only users with the role BlogUser can access this page
+    //[Authorize(Roles = "BlogUser")] // only users with the role BlogUser can access this page
+    [Authorize]
     public async Task<IActionResult> Index()
     {
         // Get the user who are asking for data
@@ -42,7 +43,7 @@ public class BlogController : Controller
                 // from PostModels
                 // where ApplicationUserId = {{currentUser.Id}}
                 // order by PostModels.PostDate desc
-            .Where(post => post.ApplicationUserId == currentUser.Id)
+            //.Where(post => post.ApplicationUserId == currentUser.Id)
             .OrderByDescending(p => p.Time)
             .ToListAsync();
 
@@ -94,17 +95,17 @@ public class BlogController : Controller
     [Authorize]
     public async Task<IActionResult> Edit(int id)
     {
-        var applicationUserModel = await _userManager.GetUserAsync(User);
         var post = await _db.PostModels.FindAsync(id);
-        
+        // Get the user who are asking for data
+        var currentUser = await _userManager.GetUserAsync(HttpContext.User);
 
-        if (_signInManager.IsSignedIn(User) && applicationUserModel != null && applicationUserModel.Id == post.ApplicationUserId) 
+        if (_signInManager.IsSignedIn(User) && currentUser != null && currentUser.Id == post.ApplicationUserId) 
         {
             
             return View(post);
         }
 
-        if (_signInManager.IsSignedIn(User) && applicationUserModel.Id != post.ApplicationUserId)
+        if (_signInManager.IsSignedIn(User) && currentUser != null && currentUser.Id != post.ApplicationUserId)
         {
             return Redirect("/Blog/EditErrror");
         }
